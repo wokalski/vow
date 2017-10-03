@@ -1,0 +1,7 @@
+{
+  "name": "vow",
+  "version": "0.0.1",
+  "devDependencies": {
+    "bs-platform": "^1.9.3"
+  }
+}

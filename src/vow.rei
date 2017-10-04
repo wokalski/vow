@@ -2,20 +2,70 @@ type handled;
 
 type unhandled;
 
-type vow 'a 'status;
+type t 'a 'status;
 
-let sideEffect: ('a => unit) => vow 'a handled => unit;
 
-let onSuccessResolve: ('a => 'b) => vow 'a handled => vow 'b handled;
+/**
+ * Returns a value wrapped in a vow
+ */
+let return: 'a => t 'a handled;
 
-let andThen: ('a => vow 'b 'status) => vow 'a handled => vow 'b 'status;
 
-let onErrorHandle: (unit => vow 'a 'status) => vow 'a unhandled => vow 'a 'status;
+/**
+ * Maps a handled vow with value of type 'a to a vow returned by the transform function
+ */
+let map: ('a => t 'b 'status) => t 'a handled => t 'b 'status;
 
-let onError: 'a => vow 'a unhandled => vow 'a handled;
 
-let wrap: Js.Promise.t 'a => vow 'a unhandled;
+/**
+ * Maps an unhandled vow with value of type 'a to a vow returned by the transform function.
+ * The returned vow is unhandled.
+ */
+let mapUnhandled: ('a => t 'b 'status) => t 'a unhandled => t 'b unhandled;
 
-let unsafeWrap: Js.Promise.t 'a => vow 'a handled;
 
-let unwrap: vow 'a handled => Js.Promise.t 'a;
+/**
+ * Performs side effects with a handled vow's value and returns unit.
+ */
+let sideEffect: ('a => unit) => t 'a handled => unit;
+
+
+/**
+ * Catches and handles the rejection of a backing promise.
+ */
+let onError: (unit => t 'a 'status) => t 'a unhandled => t 'a 'status;
+
+
+/**
+ * Wraps a promise into a vow. You should use this function for wrapping promises that
+ * might be rejected
+ */
+let wrap: Js.Promise.t 'a => t 'a unhandled;
+
+
+/**
+ * Wraps a non failing promise into a vow. Use this function if your the wrapped promise
+ * is never rejected.
+ */
+let unsafeWrap: Js.Promise.t 'a => t 'a handled;
+
+
+/**
+ * Returns the underlying JS Promise.
+ */
+let unwrap: t 'a handled => Js.Promise.t 'a;
+
+module type ResultType = {
+  type result 'value 'error;
+  type vow 'a 'status = t 'a 'status;
+  type t 'value 'error 'status = vow (result 'value 'error) 'status;
+  let return: 'value => t 'value 'error handled;
+  let fail: 'error => t 'value 'error handled;
+  let map: ('a => t 'b 'error 'status) => t 'a 'error handled => t 'b 'error 'status;
+  let mapUnhandled: ('a => t 'b 'error 'status) => t 'a 'error unhandled => t 'b 'error unhandled;
+  let sideEffect: ([ | `Success 'value | `Fail 'error] => unit) => t 'value 'error handled => unit;
+  let onError:
+    (unit => t 'error 'value 'status) => t 'error 'value unhandled => t 'error 'value 'status;
+};
+
+module Result: ResultType;

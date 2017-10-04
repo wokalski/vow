@@ -1,5 +1,14 @@
 {
   "name": "vow",
+  "description": "Almost sound Promises for Bucklescript",
+  "keywords": ["bucklescript", "reason", "ocaml", "promise"],
+  "license": "MIT",
+  "author": {
+    "name": "Wojtek Czekalski",
+    "email": "me@wczekalski.com",
+    "url": "http://twitter.com/wokalski"
+  },
+  "repository": "wokalski/vow",
   "version": "0.0.1",
   "devDependencies": {
     "bs-platform": "^1.9.3"

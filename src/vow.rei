@@ -66,6 +66,7 @@ module type ResultType = {
   let sideEffect: ([ | `Success 'value | `Fail 'error] => unit) => t 'value 'error handled => unit;
   let onError:
     (unit => t 'error 'value 'status) => t 'error 'value unhandled => t 'error 'value 'status;
+  let wrap: Js.Promise.t 'value => (unit => 'error) => t 'value 'error handled;
 };
 
 module Result: ResultType;

@@ -1,31 +1,28 @@
-type handled;
-
-type unhandled;
-
-type t 'a 'status = {promise: Js.Promise.t 'a};
-
-let return x => {promise: Js.Promise.resolve x};
-
-let map transform vow => {promise: Js.Promise.then_ (fun x => (transform x).promise) vow.promise};
-
-let mapUnhandled transform vow => {
-  promise: Js.Promise.then_ (fun x => (transform x).promise) vow.promise
+module Vow = {
+  type handled;
+  type unhandled;
+  type t 'a 'status = {promise: Js.Promise.t 'a};
+  let return x => {promise: Js.Promise.resolve x};
+  let map transform vow => {
+    promise: Js.Promise.then_ (fun x => (transform x).promise) vow.promise
+  };
+  let mapUnhandled transform vow => {
+    promise: Js.Promise.then_ (fun x => (transform x).promise) vow.promise
+  };
+  let sideEffect handler vow => {
+    let _ = Js.Promise.then_ (fun x => Js.Promise.resolve @@ handler x) vow.promise;
+    ()
+  };
+  let onError handler vow => {
+    promise: Js.Promise.catch (fun _ => (handler ()).promise) vow.promise
+  };
+  let wrap promise => {promise: promise};
+  let unsafeWrap promise => {promise: promise};
+  let unwrap {promise} => promise;
 };
-
-let sideEffect handler vow => {
-  let _ = Js.Promise.then_ (fun x => Js.Promise.resolve @@ handler x) vow.promise;
-  ()
-};
-
-let onError handler vow => {promise: Js.Promise.catch (fun _ => (handler ()).promise) vow.promise};
-
-let wrap promise => {promise: promise};
-
-let unsafeWrap promise => {promise: promise};
-
-let unwrap {promise} => promise;
 
 module type ResultType = {
+  open Vow;
   type result 'value 'error;
   type vow 'a 'status = t 'a 'status;
   type t 'value 'error 'status = vow (result 'value 'error) 'status;
@@ -36,17 +33,17 @@ module type ResultType = {
   let sideEffect: ([ | `Success 'value | `Fail 'error] => unit) => t 'value 'error handled => unit;
   let onError:
     (unit => t 'error 'value 'status) => t 'error 'value unhandled => t 'error 'value 'status;
+  let wrap: Js.Promise.t 'value => (unit => 'error) => t 'value 'error handled;
 };
 
 module Result: ResultType = {
   type result 'value 'error = [ | `Success 'value | `Fail 'error];
-  type vow 'a 'status = t 'a 'status;
+  type vow 'a 'status = Vow.t 'a 'status;
   type t 'value 'error 'status = vow (result 'value 'error) 'status;
-  let vowReturn = return;
-  let return value => vowReturn (`Success value);
-  let fail error => vowReturn (`Fail error);
+  let return value => Vow.return (`Success value);
+  let fail error => Vow.return (`Fail error);
   let map transform vow =>
-    map
+    Vow.map
       (
         fun x =>
           switch x {
@@ -56,7 +53,7 @@ module Result: ResultType = {
       )
       vow;
   let mapUnhandled transform vow =>
-    mapUnhandled
+    Vow.mapUnhandled
       (
         fun x =>
           switch x {
@@ -65,6 +62,11 @@ module Result: ResultType = {
           }
       )
       vow;
-  let sideEffect handler vow => sideEffect handler vow;
-  let onError handler vow => onError handler vow;
+  let sideEffect handler vow => Vow.sideEffect handler vow;
+  let onError handler vow => Vow.onError handler vow;
+  let wrap promise handler =>
+    Vow.wrap promise |> Vow.mapUnhandled (fun x => return x) |>
+    onError (fun () => fail (handler ()));
 };
+
+include Vow;

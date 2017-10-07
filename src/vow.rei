@@ -67,6 +67,10 @@ module type ResultType = {
   let onError:
     (unit => t 'error 'value 'status) => t 'error 'value unhandled => t 'error 'value 'status;
   let wrap: Js.Promise.t 'value => (unit => 'error) => t 'value 'error handled;
+  module type Infix = {
+    let (>>=): t 'a 'error handled => ('a => t 'b 'error 'status) => t 'b 'error 'status';
+    let (=<<): ('a => t 'b 'error 'status) => t 'a 'error handled => t 'b 'error 'status;
+  };
 };
 
 module Result: ResultType;

@@ -34,6 +34,10 @@ module type ResultType = {
   let onError:
     (unit => t 'error 'value 'status) => t 'error 'value unhandled => t 'error 'value 'status;
   let wrap: Js.Promise.t 'value => (unit => 'error) => t 'value 'error handled;
+  module type Infix = {
+    let (>>=): t 'a 'error handled => ('a => t 'b 'error 'status) => t 'b 'error 'status';
+    let (=<<): ('a => t 'b 'error 'status) => t 'a 'error handled => t 'b 'error 'status;
+  };
 };
 
 module Result: ResultType = {
@@ -65,8 +69,13 @@ module Result: ResultType = {
   let sideEffect handler vow => Vow.sideEffect handler vow;
   let onError handler vow => Vow.onError handler vow;
   let wrap promise handler =>
-    Vow.wrap promise |> Vow.mapUnhandled (fun x => return x) |>
-    onError (fun () => fail (handler ()));
+    Vow.wrap promise
+    |> Vow.mapUnhandled (fun x => return x)
+    |> onError (fun () => fail (handler ()));
+  module Infix: ResultType.Infix = {
+    let (>>=) v t => map t v;
+    let (=<<) = map;
+  };
 };
 
 include Vow;

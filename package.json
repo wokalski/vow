@@ -1,12 +1,12 @@
 {
   "name": "vow",
   "description": "Almost sound Promises for Bucklescript",
-  "keywords": [
-    "bucklescript",
-    "reason",
-    "ocaml",
-    "promise"
-  ],
+  "keywords": ["bucklescript", "reason", "ocaml", "promise"],
+  "scripts": {
+    "build": "bsb -make-world",
+    "clean": "bsb -clean-world",
+    "watch": "bsb -make-world -w"
+  },
   "license": "MIT",
   "author": {
     "name": "Wojtek Czekalski",

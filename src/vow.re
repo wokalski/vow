@@ -39,6 +39,10 @@ module type ResultType = {
     ([ | `Success 'value | `Fail 'error] => vow 'a 'status) =>
     t 'value 'error handled =>
     vow 'a 'status;
+  module Infix: {
+    let (>>=): t 'a 'error handled => ('a => t 'b 'error 'status) => t 'b 'error 'status';
+    let (=<<): ('a => t 'b 'error 'status) => t 'a 'error handled => t 'b 'error 'status;
+  };
 };
 
 module Result: ResultType = {
@@ -80,9 +84,14 @@ module Result: ResultType = {
   let sideEffect handler vow => Vow.sideEffect handler vow;
   let onError handler vow => Vow.onError handler vow;
   let wrap promise handler =>
-    Vow.wrap promise |> Vow.mapUnhandled (fun x => return x) |>
-    onError (fun () => fail (handler ()));
+    Vow.wrap promise
+    |> Vow.mapUnhandled (fun x => return x)
+    |> onError (fun () => fail (handler ()));
   let unwrap transform vow => Vow.map transform vow;
+  module Infix = {
+    let (>>=) v t => map t v;
+    let (=<<) = map;
+  };
 };
 
 include Vow;

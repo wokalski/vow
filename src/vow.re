@@ -35,10 +35,15 @@ module type ResultType = {
     ('a => t 'b 'error 'status) => t 'a 'error unhandled => t 'b 'error unhandled;
   let map: ('a => 'b) => t 'a 'error handled => t 'b 'error 'status;
   let mapUnhandled: ('a => 'b) => t 'a 'error unhandled => t 'b 'error unhandled;
+  let mapError: ('a => t 'value 'b handled) => t 'value 'a 'status => t 'value 'b 'status;
   let sideEffect: ([ | `Success 'value | `Fail 'error] => unit) => t 'value 'error handled => unit;
   let onError:
     (unit => t 'error 'value 'status) => t 'error 'value unhandled => t 'error 'value 'status;
   let wrap: Js.Promise.t 'value => (unit => 'error) => t 'value 'error handled;
+  let unwrap:
+    ([ | `Success 'value | `Fail 'error] => vow 'a 'status) =>
+    t 'value 'error handled =>
+    vow 'a 'status;
   module Infix: {
     let (>>=): t 'a 'error handled => ('a => t 'b 'error 'status) => t 'b 'error 'status';
     let (=<<): ('a => t 'b 'error 'status) => t 'a 'error handled => t 'b 'error 'status;
@@ -75,12 +80,23 @@ module Result: ResultType = {
       vow;
   let map transform vow => flatMap (fun x => return (transform x)) vow;
   let mapUnhandled transform vow => flatMapUnhandled (fun x => return (transform x)) vow;
+  let mapError transform vow =>
+    Vow.flatMap
+      (
+        fun x =>
+          switch x {
+          | `Success x => return x
+          | `Fail x => transform x
+          }
+      )
+      vow;
   let sideEffect handler vow => Vow.sideEffect handler vow;
   let onError handler vow => Vow.onError handler vow;
   let wrap promise handler =>
     Vow.wrap promise
     |> Vow.flatMapUnhandled (fun x => return x)
     |> onError (fun () => fail (handler ()));
+  let unwrap transform vow => Vow.flatMap transform vow;
   module Infix = {
     let (>>=) v t => flatMap t v;
     let (=<<) = flatMap;

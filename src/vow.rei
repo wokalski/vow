@@ -14,14 +14,14 @@ let return: 'a => t 'a handled;
 /**
  * Maps a handled vow with value of type 'a to a vow returned by the transform function
  */
-let flatMap: ('a => t 'b 'status) => t 'a handled => t 'b 'status;
+let bind: ('a => t 'b 'status) => t 'a handled => t 'b 'status;
 
 
 /**
  * Maps an unhandled vow with value of type 'a to a vow returned by the transform function.
  * The returned vow is unhandled.
  */
-let flatMapUnhandled: ('a => t 'b 'status) => t 'a unhandled => t 'b unhandled;
+let bindUnhandled: ('a => t 'b 'status) => t 'a unhandled => t 'b unhandled;
 
 
 /**
@@ -75,9 +75,8 @@ module type ResultType = {
   type t 'value 'error 'status = vow (result 'value 'error) 'status;
   let return: 'value => t 'value 'error handled;
   let fail: 'error => t 'value 'error handled;
-  let flatMap: ('a => t 'b 'error 'status) => t 'a 'error handled => t 'b 'error 'status;
-  let flatMapUnhandled:
-    ('a => t 'b 'error 'status) => t 'a 'error unhandled => t 'b 'error unhandled;
+  let bind: ('a => t 'b 'error 'status) => t 'a 'error handled => t 'b 'error 'status;
+  let bindUnhandled: ('a => t 'b 'error 'status) => t 'a 'error unhandled => t 'b 'error unhandled;
   let map: ('a => 'b) => t 'a 'error handled => t 'b 'error 'status;
   let mapUnhandled: ('a => 'b) => t 'a 'error unhandled => t 'b 'error unhandled;
   let mapError: ('a => t 'value 'b handled) => t 'value 'a 'status => t 'value 'b 'status;

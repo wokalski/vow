@@ -46,8 +46,8 @@ module type ResultType = {
   module Infix: {
     let (>>=): t 'a 'error handled => ('a => t 'b 'error 'status) => t 'b 'error 'status';
     let (=<<): ('a => t 'b 'error 'status) => t 'a 'error handled => t 'b 'error 'status;
-    let (>>|): t 'a 'error handled => ('a => 'b) => t 'b 'error 'status;
-    let (|<<): ('a => 'b) => t 'a 'error handled => t 'b 'error 'status;
+    let (>|=): t 'a 'error handled => ('a => 'b) => t 'b 'error 'status;
+    let (=|<): ('a => 'b) => t 'a 'error handled => t 'b 'error 'status;
   };
 };
 
@@ -99,8 +99,8 @@ module Result: ResultType = {
   module Infix = {
     let (>>=) v t => bind t v;
     let (=<<) = bind;
-    let (>>|) v t => map t v;
-    let (|<<) = map;
+    let (>|=) v t => map t v;
+    let (=|<) = map;
   };
 };
 

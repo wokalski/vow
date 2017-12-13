@@ -14,14 +14,28 @@ let return: 'a => t 'a handled;
 /**
  * Maps a handled vow with value of type 'a to a vow returned by the transform function
  */
-let map: ('a => t 'b 'status) => t 'a handled => t 'b 'status;
+let flatMap: ('a => t 'b 'status) => t 'a handled => t 'b 'status;
 
 
 /**
  * Maps an unhandled vow with value of type 'a to a vow returned by the transform function.
  * The returned vow is unhandled.
  */
-let mapUnhandled: ('a => t 'b 'status) => t 'a unhandled => t 'b unhandled;
+let flatMapUnhandled: ('a => t 'b 'status) => t 'a unhandled => t 'b unhandled;
+
+
+/**
+ * Maps a handled vow with value of type 'a to a vow of the value
+ * returned by the transform function
+ */
+let map: ('a => 'b) => t 'a handled => t 'b 'status;
+
+
+/**
+ * Maps a handled vow with value of type 'a to a vow of the value
+ * returned by the transform function
+ */
+let mapUnhandled: ('a => 'b) => t 'a unhandled => t 'b unhandled;
 
 
 /**
@@ -61,8 +75,10 @@ module type ResultType = {
   type t 'value 'error 'status = vow (result 'value 'error) 'status;
   let return: 'value => t 'value 'error handled;
   let fail: 'error => t 'value 'error handled;
-  let map: ('a => t 'b 'error 'status) => t 'a 'error handled => t 'b 'error 'status;
-  let mapUnhandled: ('a => t 'b 'error 'status) => t 'a 'error unhandled => t 'b 'error unhandled;
+  let flatMap: ('a => t 'b 'error 'status) => t 'a 'error handled => t 'b 'error 'status;
+  let flatMapUnhandled: ('a => t 'b 'error 'status) => t 'a 'error unhandled => t 'b 'error unhandled;
+  let map: ('a => 'b) => t 'a 'error handled => t 'b 'error 'status;
+  let mapUnhandled: ('a => 'b) => t 'a 'error unhandled => t 'b 'error unhandled;
   let mapError: ('a => t 'value 'b handled) => t 'value 'a 'status => t 'value 'b 'status;
   let sideEffect: ([ | `Success 'value | `Fail 'error] => unit) => t 'value 'error handled => unit;
   let onError:
@@ -74,7 +90,7 @@ module type ResultType = {
     vow 'a 'status;
   module Infix: {
     let (>>=): t 'a 'error handled => ('a => t 'b 'error 'status) => t 'b 'error 'status';
-    let (=<<): ('a => t 'b 'error 'status) => t 'a 'error handled => t 'b 'error 'status;
+    let (>|=): t 'a 'error handled => ('a => 'b) => t 'b 'error handled;
   };
 };
 

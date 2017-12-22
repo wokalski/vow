@@ -7,12 +7,23 @@
     "clean": "bsb -clean-world",
     "watch": "bsb -make-world -w"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wokalski/vow.git"
+  },
+  "homepage": "https://github.com/wokalski/vow#readme",
+  "bugs": "https://github.com/wokalski/vow/issues",
   "license": "MIT",
   "author": {
     "name": "Wojtek Czekalski",
     "email": "me@wczekalski.com",
     "url": "http://twitter.com/wokalski"
   },
+  "keywords": [
+    "reason",
+    "bucklescript",
+    "promise"
+  ],
   "repository": "wokalski/vow",
   "version": "0.0.2",
   "devDependencies": {

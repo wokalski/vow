@@ -8,7 +8,7 @@ type t('a, 'status);
 /***
  * Returns a value wrapped in a vow
  */
-let return: 'a => t('a, 'status);
+let return: 'a => t('a, handled);
 
 
 /***
@@ -70,16 +70,16 @@ let unsafeWrap: Js.Promise.t('a) => t('a, handled);
 let unwrap: t('a, handled) => Js.Promise.t('a);
 
 module type ResultType = {
-  type result('value, 'error) = [ | `Success('value) | `Fail('error)];
+  type result('value, 'error);
   type vow('a, 'status) = t('a, 'status);
   type t('value, 'error, 'status) = vow(result('value, 'error), 'status);
   let return: 'value => t('value, 'error, handled);
   let fail: 'error => t('value, 'error, handled);
   let flatMap: ('a => t('b, 'error, 'status), t('a, 'error, handled)) => t('b, 'error, 'status);
-  /* let flatMapUnhandled:
-     ('a => t('b, 'error, 'status), t('a, 'error, unhandled)) => t('b, 'error, unhandled); */
-  /* let map: ('a => 'b, t('a, 'error, handled)) => t('b, 'error, 'status); */
-  /* let mapUnhandled: ('a => 'b, t('a, 'error, unhandled)) => t('b, 'error, unhandled); */
+  let flatMapUnhandled:
+    ('a => t('b, 'error, 'status), t('a, 'error, unhandled)) => t('b, 'error, unhandled);
+  let map: ('a => 'b, t('a, 'error, handled)) => t('b, 'error, 'status);
+  let mapUnhandled: ('a => 'b, t('a, 'error, unhandled)) => t('b, 'error, unhandled);
   let mapError: ('a => t('value, 'b, handled), t('value, 'a, 'status)) => t('value, 'b, 'status);
   let sideEffect:
     ([ | `Success('value) | `Fail('error)] => unit, t('value, 'error, handled)) => unit;
@@ -91,8 +91,8 @@ module type ResultType = {
     ([ | `Success('value) | `Fail('error)] => vow('a, 'status), t('value, 'error, handled)) =>
     vow('a, 'status);
   module Infix: {
-    /* let (>>=): (t('a, 'error, handled), 'a => t('b, 'error, 'status)) => t('b, 'error, 'status'); */
-    /* let (>|=): (t('a, 'error, handled), 'a => 'b) => t('b, 'error, handled); */
+    let (>>=): (t('a, 'error, handled), 'a => t('b, 'error, 'status)) => t('b, 'error, 'status');
+    let (>|=): (t('a, 'error, handled), 'a => 'b) => t('b, 'error, handled);
   };
 };
 

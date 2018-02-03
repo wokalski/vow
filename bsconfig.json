@@ -1,5 +1,10 @@
 {
   "name": "vow",
-  "bsc-flags": ["-bs-super-errors"],
-  "sources": ["src"]
+  "refmt": 3,
+  "bsc-flags": [
+    "-bs-super-errors"
+  ],
+  "sources": [
+    "src"
+  ]
 }

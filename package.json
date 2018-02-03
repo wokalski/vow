@@ -1,16 +1,17 @@
 {
   "name": "vow",
   "description": "Almost sound Promises for Bucklescript",
-  "keywords": ["bucklescript", "reason", "ocaml", "promise"],
+  "keywords": [
+    "reason",
+    "bucklescript",
+    "promise"
+  ],
   "scripts": {
     "build": "bsb -make-world",
     "clean": "bsb -clean-world",
     "watch": "bsb -make-world -w"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/wokalski/vow.git"
-  },
+  "repository": "wokalski/vow",
   "homepage": "https://github.com/wokalski/vow#readme",
   "bugs": "https://github.com/wokalski/vow/issues",
   "license": "MIT",
@@ -19,14 +20,8 @@
     "email": "me@wczekalski.com",
     "url": "http://twitter.com/wokalski"
   },
-  "keywords": [
-    "reason",
-    "bucklescript",
-    "promise"
-  ],
-  "repository": "wokalski/vow",
   "version": "0.0.2",
   "devDependencies": {
-    "bs-platform": "^1.9.3"
+    "bs-platform": "^2.1.0"
   }
 }

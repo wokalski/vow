@@ -12,7 +12,7 @@ const innerReturn = (p) => {
   if (Promise.resolve(p) === p) {
     return Promise.resolve({ inner: p });
   } else {
-    return Js.Promise.resolve(p);
+    return Promise.resolve(p);
   }
 };
 

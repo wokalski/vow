@@ -1,35 +1,14 @@
 module Vow = {
   type handled;
   type unhandled;
-  type inner('a);
+  type inner('a) = {inner: 'a};
   type t('a, 'status) = {promise: Js.Promise.t(inner('a))};
   /* BEGIN: SECTION OF VERY BAD THINGS */
-  /* Taking a fighting fire with fire stategy. Esentially type safety is ironically forcing us to not be able to soundly type promises. Since JS has no such limitation, it can box and unbox intelligently without
-     the type system being the wiser. */
-  [%%bs.raw
-    {|
-const innerReturn = (p) => {
-  if (Promise.resolve(p) === p) {
-    return Promise.resolve({ inner: p });
-  } else {
-    return Promise.resolve(p);
-  }
-};
-
-const innerUnwrap = (p) => {
-  if (p.inner && Promise.resolve(p.inner) === p.inner) {
-    return p.inner;
-  } else {
-    return p;
-  }
-};
-  |}
-  ];
-  [@bs.val] external innerReturn : 'a => Js.Promise.t(inner('a)) = "";
-  [@bs.val] external innerUnwrap : inner('a) => 'a = "";
+  let innerReturn = (v) => {inner: v};
+  let innerUnwrap = (v) => v.inner;
   external fromPromise : Js.Promise.t('a) => Js.Promise.t(inner('a)) = "%identity";
   /* END: SECTION OF VERY BAD THINGS */
-  let return: 'a => t('a, 'status) = (x) => {promise: innerReturn(x)};
+  let return: 'a => t('a, 'status) = (x) => {promise: Js.Promise.resolve(innerReturn(x))};
   let flatMap = (transform, vow) => {
     promise: Js.Promise.then_((x) => transform(innerUnwrap(x)).promise, vow.promise)
   };

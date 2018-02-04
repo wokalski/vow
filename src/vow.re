@@ -3,10 +3,8 @@ module Vow = {
   type unhandled;
   type inner('a) = {inner: 'a};
   type t('a, 'status) = Js.Promise.t(inner('a));
-  /* BEGIN: SECTION OF VERY BAD THINGS */
   let innerReturn = (v) => {inner: v};
   let innerUnwrap = (v) => v.inner;
-  /* END: SECTION OF VERY BAD THINGS */
   let return: 'a => t('a, 'status) = (x) => Js.Promise.resolve(innerReturn(x));
   let flatMap = (transform, vow) => Js.Promise.then_((x) => transform(innerUnwrap(x)), vow);
   let flatMapUnhandled: ('a => t('b, 'status), t('a, unhandled)) => t('b, unhandled) =

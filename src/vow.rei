@@ -63,11 +63,13 @@ let wrap: Js.Promise.t('a) => t('a, unhandled);
  */
 let unsafeWrap: Js.Promise.t('a) => t('a, handled);
 
+type container('a) = {value: 'a};
+
 
 /***
  * Returns the underlying JS Promise.
  */
-let unwrap: t('a, handled) => Js.Promise.t('a);
+let unwrap: t('a, handled) => Js.Promise.t(container('a));
 
 module type ResultType = {
   type result('value, 'error);

@@ -1,20 +1,20 @@
 module Vow = {
   type handled;
   type unhandled;
-  type inner('a) = {inner: 'a};
-  type t('a, 'status) = {promise: Js.Promise.t(inner('a))};
+  type container('a) = {value: 'a};
+  type t('a, 'status) = {promise: Js.Promise.t(container('a))};
   external toHandled : t('a, 'status1) => t('a, handled) = "%identity";
-  let innerReturn = (v) => {inner: v};
-  let outerWrap: Js.Promise.t(inner('a)) => t('a, 'status) = (promise) => {promise: promise};
+  let innerReturn = (v) => {value: v};
+  let outerWrap: Js.Promise.t(container('a)) => t('a, 'status) = (promise) => {promise: promise};
   let return = (x) => outerWrap(Js.Promise.resolve(innerReturn(x)));
   let flatMap = (transform, vow) =>
-    outerWrap(Js.Promise.then_((x) => transform(x.inner).promise, vow.promise));
+    outerWrap(Js.Promise.then_((x) => transform(x.value).promise, vow.promise));
   let flatMapUnhandled = (transform, vow) =>
-    outerWrap(Js.Promise.then_((inn) => transform(inn.inner).promise, vow.promise));
+    outerWrap(Js.Promise.then_((inn) => transform(inn.value).promise, vow.promise));
   let map = (transform, vow) => flatMap((x) => return(transform(x)), vow);
   let mapUnhandled = (transform, vow) => flatMapUnhandled((x) => return(transform(x)), vow);
   let sideEffect = (handler, vow) => {
-    let _ = Js.Promise.then_((x) => Js.Promise.resolve(handler(x.inner)), vow.promise);
+    let _ = Js.Promise.then_((x) => Js.Promise.resolve(handler(x.value)), vow.promise);
     ()
   };
   let onError = (handler, vow) =>
@@ -23,7 +23,7 @@ module Vow = {
     outerWrap(Js.Promise.then_((res) => Js.Promise.resolve(innerReturn(res)), promise));
   let unsafeWrap = (promise) =>
     outerWrap(Js.Promise.then_((res) => Js.Promise.resolve(innerReturn(res)), promise));
-  let unwrap = (vow) => Js.Promise.then_((x) => Js.Promise.resolve(x.inner), vow.promise);
+  let unwrap = (vow) => vow.promise;
 };
 
 module type ResultType = {

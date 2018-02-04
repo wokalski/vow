@@ -14,3 +14,11 @@ Vow.return(Js.Promise.resolve("hello"))
 /* Vow inside promise */
 Js.Promise.resolve(Vow.return("hello"))
 |> Js.Promise.then_((strVow) => Js.Promise.resolve(Vow.sideEffect(Js.log, strVow)));
+
+Vow.return(Js.Promise.resolve("unwrapping"))
+|> Vow.unwrap
+|> Js.Promise.then_(
+     (promise: Vow.container(_)) =>
+       Js.Promise.then_((x) => Js.log(x) |> Js.Promise.resolve, promise.value)
+   )
+|> ignore;

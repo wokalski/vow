@@ -6,7 +6,6 @@ module Vow = {
   /* BEGIN: SECTION OF VERY BAD THINGS */
   let innerReturn = (v) => {inner: v};
   let innerUnwrap = (v) => v.inner;
-  external fromPromise : Js.Promise.t('a) => Js.Promise.t(inner('a)) = "%identity";
   /* END: SECTION OF VERY BAD THINGS */
   let return: 'a => t('a, 'status) = (x) => {promise: Js.Promise.resolve(innerReturn(x))};
   let flatMap = (transform, vow) => {
@@ -26,8 +25,12 @@ module Vow = {
   let onError = (handler, vow) => {
     promise: Js.Promise.catch((_) => handler().promise, vow.promise)
   };
-  let wrap = (promise) => {promise: fromPromise(promise)};
-  let unsafeWrap = (promise) => {promise: fromPromise(promise)};
+  let wrap = (promise) => {
+    promise: Js.Promise.then_((res) => Js.Promise.resolve(innerReturn(res)), promise)
+  };
+  let unsafeWrap = (promise) => {
+    promise: Js.Promise.then_((res) => Js.Promise.resolve(innerReturn(res)), promise)
+  };
   let unwrap = ({promise}) => Js.Promise.then_((x) => Js.Promise.resolve(innerUnwrap(x)), promise);
 };
 

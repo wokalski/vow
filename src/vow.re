@@ -2,36 +2,27 @@ module Vow = {
   type handled;
   type unhandled;
   type inner('a) = {inner: 'a};
-  type t('a, 'status) = {promise: Js.Promise.t(inner('a))};
+  type t('a, 'status) = Js.Promise.t(inner('a));
   /* BEGIN: SECTION OF VERY BAD THINGS */
   let innerReturn = (v) => {inner: v};
   let innerUnwrap = (v) => v.inner;
   /* END: SECTION OF VERY BAD THINGS */
-  let return: 'a => t('a, 'status) = (x) => {promise: Js.Promise.resolve(innerReturn(x))};
-  let flatMap = (transform, vow) => {
-    promise: Js.Promise.then_((x) => transform(innerUnwrap(x)).promise, vow.promise)
-  };
+  let return: 'a => t('a, 'status) = (x) => Js.Promise.resolve(innerReturn(x));
+  let flatMap = (transform, vow) => Js.Promise.then_((x) => transform(innerUnwrap(x)), vow);
   let flatMapUnhandled: ('a => t('b, 'status), t('a, unhandled)) => t('b, unhandled) =
-    (transform, vow) => {
-      promise: Js.Promise.then_((x) => transform(innerUnwrap(x)).promise, vow.promise)
-    };
+    (transform, vow) => Js.Promise.then_((x) => transform(innerUnwrap(x)), vow);
   let map = (transform, vow) => flatMap((x) => return(transform(x)), vow);
   let mapUnhandled: ('a => 'b, t('a, unhandled)) => t('b, unhandled) =
     (transform, vow) => flatMapUnhandled((x) => return(transform(x)), vow);
   let sideEffect = (handler, vow) => {
-    let _ = Js.Promise.then_((x) => Js.Promise.resolve @@ handler(innerUnwrap(x)), vow.promise);
+    let _ = Js.Promise.then_((x) => Js.Promise.resolve @@ handler(innerUnwrap(x)), vow);
     ()
   };
-  let onError = (handler, vow) => {
-    promise: Js.Promise.catch((_) => handler().promise, vow.promise)
-  };
-  let wrap = (promise) => {
-    promise: Js.Promise.then_((res) => Js.Promise.resolve(innerReturn(res)), promise)
-  };
-  let unsafeWrap = (promise) => {
-    promise: Js.Promise.then_((res) => Js.Promise.resolve(innerReturn(res)), promise)
-  };
-  let unwrap = ({promise}) => Js.Promise.then_((x) => Js.Promise.resolve(innerUnwrap(x)), promise);
+  let onError = (handler, vow) => Js.Promise.catch((_) => handler(), vow);
+  let wrap = (promise) => Js.Promise.then_((res) => Js.Promise.resolve(innerReturn(res)), promise);
+  let unsafeWrap = (promise) =>
+    Js.Promise.then_((res) => Js.Promise.resolve(innerReturn(res)), promise);
+  let unwrap = (promise) => Js.Promise.then_((x) => Js.Promise.resolve(innerUnwrap(x)), promise);
 };
 
 module type ResultType = {

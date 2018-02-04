@@ -2,25 +2,28 @@ module Vow = {
   type handled;
   type unhandled;
   type inner('a) = {inner: 'a};
-  type t('a, 'status) = Js.Promise.t(inner('a));
+  type t('a, 'status) = {promise: Js.Promise.t(inner('a))};
+  external toHandled : t('a, 'status1) => t('a, handled) = "%identity";
   let innerReturn = (v) => {inner: v};
-  let return: 'a => t('a, 'status) = (x) => Js.Promise.resolve(innerReturn(x));
-  let flatMap: ('a => t('b, 'status), t('a, handled)) => t('b, 'status) =
-    (transform, vow) => Js.Promise.then_((x) => transform(x.inner), vow);
-  let flatMapUnhandled: ('a => t('b, 'status), t('a, unhandled)) => t('b, unhandled) =
-    (transform, vow) => Js.Promise.then_(({inner}) => transform(inner), vow);
+  let outerWrap: Js.Promise.t(inner('a)) => t('a, 'status) = (promise) => {promise: promise};
+  let return = (x) => outerWrap(Js.Promise.resolve(innerReturn(x)));
+  let flatMap = (transform, vow) =>
+    outerWrap(Js.Promise.then_((x) => transform(x.inner).promise, vow.promise));
+  let flatMapUnhandled = (transform, vow) =>
+    outerWrap(Js.Promise.then_((inn) => transform(inn.inner).promise, vow.promise));
   let map = (transform, vow) => flatMap((x) => return(transform(x)), vow);
-  let mapUnhandled: ('a => 'b, t('a, unhandled)) => t('b, unhandled) =
-    (transform, vow) => flatMapUnhandled((x) => return(transform(x)), vow);
+  let mapUnhandled = (transform, vow) => flatMapUnhandled((x) => return(transform(x)), vow);
   let sideEffect = (handler, vow) => {
-    let _ = Js.Promise.then_((x) => Js.Promise.resolve @@ handler(x.inner), vow);
+    let _ = Js.Promise.then_((x) => Js.Promise.resolve(handler(x.inner)), vow.promise);
     ()
   };
-  let onError = (handler, vow) => Js.Promise.catch((_) => handler(), vow);
-  let wrap = (promise) => Js.Promise.then_((res) => Js.Promise.resolve(innerReturn(res)), promise);
+  let onError = (handler, vow) =>
+    outerWrap(Js.Promise.catch((_) => handler().promise, vow.promise));
+  let wrap = (promise) =>
+    outerWrap(Js.Promise.then_((res) => Js.Promise.resolve(innerReturn(res)), promise));
   let unsafeWrap = (promise) =>
-    Js.Promise.then_((res) => Js.Promise.resolve(innerReturn(res)), promise);
-  let unwrap = (promise) => Js.Promise.then_((x) => Js.Promise.resolve(x.inner), promise);
+    outerWrap(Js.Promise.then_((res) => Js.Promise.resolve(innerReturn(res)), promise));
+  let unwrap = (vow) => Js.Promise.then_((x) => Js.Promise.resolve(x.inner), vow.promise);
 };
 
 module type ResultType = {
@@ -54,14 +57,16 @@ module type ResultType = {
 module Result = {
   type result('value, 'error) = [ | `Success('value) | `Fail('error)];
   type vow('a, 'status) = Vow.t('a, 'status);
-  type t('value, 'error, 'status) = vow(result('value, 'error), 'status);
+  type t('value, 'error, 'status) = Vow.t(result('value, 'error), 'status);
   let return = (value) => Vow.return(`Success(value));
   let fail = (error) => Vow.return(`Fail(error));
   let flatMap = (transform, vow) =>
     Vow.flatMap(
-      fun
-      | `Success(value) => transform(value)
-      | `Fail(err) => fail(err),
+      (x) =>
+        switch x {
+        | `Success(x) => transform(x)
+        | `Fail(x) => fail(x)
+        },
       vow
     );
   let flatMapUnhandled = (transform, vow) =>
@@ -79,22 +84,19 @@ module Result = {
     Vow.flatMap(
       (x) =>
         switch x {
-        | `Success(x) => return(x)
-        | `Fail(x) => transform(x)
+        | `Success(x) => return(x) |> Vow.toHandled
+        | `Fail(x) => transform(x) |> Vow.toHandled
         },
       vow
     );
   let sideEffect = (handler, vow) => Vow.sideEffect(handler, vow);
   let onError = (handler, vow) => Vow.onError(handler, vow);
   let wrap = (promise, handler) =>
-    Vow.wrap(promise) |> Vow.flatMapUnhandled((x) => return(x)) |> onError(() => fail(handler()));
+    Vow.wrap(promise) |> Vow.flatMapUnhandled(return) |> onError(() => fail(handler()));
   let unwrap = (transform, vow) => Vow.flatMap(transform, vow);
   module Infix = {
-    let (>>=):
-      (t('a, 'error, Vow.handled), 'a => t('b, 'error, 'status)) => t('b, 'error, 'status') =
-      (v, t) => flatMap(t, v);
-    let (>|=): (t('a, 'error, Vow.handled), 'a => 'b) => t('b, 'error, Vow.handled) =
-      (v, t) => map(t, v);
+    let (>>=) = (v, t) => flatMap(t, v);
+    let (>|=) = (v, t) => map(t, v);
   };
 };
 

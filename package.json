@@ -25,8 +25,8 @@
     "promise"
   ],
   "repository": "wokalski/vow",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "devDependencies": {
-    "bs-platform": "^1.9.3"
+    "bs-platform": "^2.1.0"
   }
 }

@@ -1,5 +1,5 @@
 {
-  "name": "vow",
+  "name": "@wokalski/vow",
   "description": "Almost sound Promises for Bucklescript",
   "keywords": ["bucklescript", "reason", "ocaml", "promise"],
   "scripts": {

@@ -1,5 +1,5 @@
 {
-  "name": "vow",
+  "name": "@wokalski/vow",
   "bsc-flags": ["-bs-super-errors"],
   "sources": ["src"]
 }

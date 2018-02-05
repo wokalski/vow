@@ -7,14 +7,14 @@ A `Vow` can be either `handled` and `unhandled`. All promises of type `vow 'a ha
 ## Installation
 
 ```sh
-npm install --save wokalski/vow
+npm install --save @wokalski/vow
 ```
 
 Then add `vow` to `bs-dependencies` in your `bsconfig.json`:
 ```js
 {
   ...
-  "bs-dependencies": ["vow"]
+  "bs-dependencies": ["@wokalski/vow"]
 }
 ```
 

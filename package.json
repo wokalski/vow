@@ -1,5 +1,5 @@
 {
-  "name": "vow",
+  "name": "@wokalskivow",
   "description": "Almost sound Promises for Bucklescript",
   "keywords": [
     "reason",
@@ -20,7 +20,13 @@
     "email": "me@wczekalski.com",
     "url": "http://twitter.com/wokalski"
   },
-  "version": "0.0.2",
+  "keywords": [
+    "reason",
+    "bucklescript",
+    "promise"
+  ],
+  "repository": "wokalski/vow",
+  "version": "0.0.3",
   "devDependencies": {
     "bs-platform": "^2.1.0"
   }

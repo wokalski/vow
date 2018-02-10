@@ -4,6 +4,20 @@
 
 A `Vow` can be either `handled` and `unhandled`. All promises of type `vow 'a handled` make sure that you handled Promise rejections. Thanks to that you will avoid the Uncaught promise error.
 
+## Installation
+
+```sh
+npm install --save @wokalski/vow
+```
+
+Then add `vow` to `bs-dependencies` in your `bsconfig.json`:
+```js
+{
+  ...
+  "bs-dependencies": ["@wokalski/vow"]
+}
+```
+
 ## Side effects
 
 After series of operations you usually want to "consume" a promise. `Vow.sideEffect` should be used for that.

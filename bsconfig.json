@@ -1,5 +1,5 @@
 {
-  "name": "vow",
+  "name": "@wokalski/vow",
   "refmt": 3,
   "bsc-flags": [
     "-bs-super-errors"

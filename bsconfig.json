@@ -1,5 +1,10 @@
 {
+  "refmt": 3,
   "name": "@wokalski/vow",
-  "bsc-flags": ["-bs-super-errors"],
-  "sources": ["src"]
+  "bsc-flags": [
+    "-bs-super-errors"
+  ],
+  "sources": [
+    "src"
+  ]
 }

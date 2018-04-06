@@ -65,7 +65,7 @@ let login _: Vow.Result.t authenticationState error Vow.handled =>
   /* Returns a handled Vow.Result.t */
   Login.logIn () |>
   /* Validates the returned value. Since the vow is handled we don't need to catch*/
-  Vow.Result.map (
+  Vow.Result.flatMap (
     fun x =>
       if x##isCancelled {
         Vow.Result.fail LoginRequestCancelled
@@ -74,7 +74,7 @@ let login _: Vow.Result.t authenticationState error Vow.handled =>
       }
   ) |>
   /* Another handled Vow.Result.t */
-  Vow.Result.map Login.getCurrentAccessToken () |>
+  Vow.Result.flatMap Login.getCurrentAccessToken () |>
   Vow.Result.map (
     fun x => {
       let token = x##accessToken;
@@ -90,7 +90,7 @@ let login _: Vow.Result.t authenticationState error Vow.handled =>
    * We are forced to handle it in the compile time.
    */
   Vow.Result.onError (fun _ => Vow.Result.fail GraphQlSignInError) |>
-  Vow.Result.map (
+  Vow.Result.flatMap (
     fun x =>
       switch x {
       | Authenticated {token, userId} =>

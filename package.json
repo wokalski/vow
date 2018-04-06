@@ -22,6 +22,6 @@
   },
   "version": "0.0.3",
   "devDependencies": {
-    "bs-platform": "^2.1.0"
+    "bs-platform": "^2.2.3"
   }
 }

@@ -72,6 +72,36 @@ type container('a) = {value: 'a};
  */
 let unwrap: t('a, handled) => Js.Promise.t(container('a));
 
+
+/***
+ * Takes a tuple of 2 vows and returns a vow with a tuple of their results
+ */
+let all2: ((t('v1, handled), t('v2, handled))) => t(('v1, 'v2), handled);
+
+
+/***
+ * Takes a tuple of 3 vows and returns a vow with a tuple of their results
+ */
+let all3:
+  ((t('v1, handled), t('v2, handled), t('v3, handled))) =>
+  t(('v1, 'v2, 'v3), handled);
+
+
+/***
+ * Takes a tuple of 4 vows and returns a vow with a tuple of their results
+ */
+let all4:
+  (
+    (t('v1, handled), t('v2, handled), t('v3, handled), t('v4, handled))
+  ) =>
+  t(('v1, 'v2, 'v3, 'v4), handled);
+
+
+/***
+ * Takes a list of vows and returns a vow with a list of their results
+ */
+let all: list(t('value, handled)) => t(list('value), handled);
+
 module type ResultType = {
   type vow('a, 'status) = t('a, 'status);
   type t('value, 'error, 'status) =
@@ -103,6 +133,30 @@ module type ResultType = {
       t('value, 'error, handled)
     ) =>
     vow('a, 'status);
+  let all2:
+    ((t('v1, 'error, handled), t('v2, 'error, handled))) =>
+    t(('v1, 'v2), 'error, handled);
+  let all3:
+    (
+      (
+        t('v1, 'error, handled),
+        t('v2, 'error, handled),
+        t('v3, 'error, handled),
+      )
+    ) =>
+    t(('v1, 'v2, 'v3), 'error, handled);
+  let all4:
+    (
+      (
+        t('v1, 'error, handled),
+        t('v2, 'error, handled),
+        t('v3, 'error, handled),
+        t('v4, 'error, handled),
+      )
+    ) =>
+    t(('v1, 'v2, 'v3, 'v4), 'error, handled);
+  let all:
+    list(t('value, 'error, handled)) => t(list('value), 'error, handled);
   module Infix: {
     let (>>=):
       (t('a, 'error, handled), 'a => t('b, 'error, 'status)) =>

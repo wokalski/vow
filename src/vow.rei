@@ -97,6 +97,11 @@ let all4:
   t(('v1, 'v2, 'v3, 'v4), handled);
 
 
+/***
+ * Takes a list of vows and returns a vow with a list of their results
+ */
+let all: list(t('value, handled)) => t(list('value), handled);
+
 module type ResultType = {
   type vow('a, 'status) = t('a, 'status);
   type t('value, 'error, 'status) =
@@ -150,6 +155,8 @@ module type ResultType = {
       )
     ) =>
     t(('v1, 'v2, 'v3, 'v4), 'error, handled);
+  let all:
+    list(t('value, 'error, handled)) => t(list('value), 'error, handled);
   module Infix: {
     let (>>=):
       (t('a, 'error, handled), 'a => t('b, 'error, 'status)) =>

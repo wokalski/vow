@@ -59,6 +59,15 @@ module Vow = {
               return((v1Result, v2Result, v3Result, v4Result))
             )
        );
+  let rec all = vows =>
+    switch (vows) {
+    | [head, ...tail] =>
+      all(tail)
+      |> flatMap(tailResult =>
+           head |> flatMap(headResult => return([headResult, ...tailResult]))
+         )
+    | [] => return([])
+    };
 };
 
 module type ResultType = {
@@ -115,6 +124,8 @@ module type ResultType = {
       )
     ) =>
     t(('v1, 'v2, 'v3, 'v4), 'error, handled);
+  let all:
+    list(t('value, 'error, handled)) => t(list('value), 'error, handled);
   module Infix: {
     let (>>=):
       (t('a, 'error, handled), 'a => t('b, 'error, 'status)) =>
@@ -184,6 +195,15 @@ module Result: ResultType = {
               return((v1Result, v2Result, v3Result, v4Result))
             )
        );
+  let rec all = vows =>
+    switch (vows) {
+    | [head, ...tail] =>
+      all(tail)
+      |> flatMap(tailResult =>
+           head |> flatMap(headResult => return([headResult, ...tailResult]))
+         )
+    | [] => return([])
+    };
   module Infix = {
     let (>>=) = (v, t) => flatMap(t, v);
     let (>|=) = (v, t) => map(t, v);

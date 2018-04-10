@@ -1,0 +1,161 @@
+
+    
+<!doctype html>
+<meta charset=utf8>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel=stylesheet href='../styles.css'>
+<script defer src='../script.js'></script>
+<title>vow</title>
+<body>
+<script>window.relativeToRoot=".."</script>
+<script defer src="../block-script.js"></script>
+<div id='error-message'>
+  ⚠️ Oops! This page doesn't appear to define a <span>type</span> called <code>_</code>.
+</div>
+
+    <script>window.shouldCheckHashes=true</script>
+    <div class='container'>
+    
+    <div class='sidebar-wrapper'>
+    <div class='sidebar-expander'>Show navigation</div>
+    <div class='sidebar'>
+      <a href="../search.html" style="display: block; padding: 0 8px;">Search</a>
+      <div class='docs-listing'><a href="../index.html">Home</a></div>
+      <div class='table-of-contents'>
+      <div class='toc-header'>Page Contents</div>
+      <a href="#vow" class='level-1 header'>vow</a>
+<a href="#type-handled" class='level-2 type'>handled</a>
+<a href="#type-unhandled" class='level-2 type'>unhandled</a>
+<a href="#type-t" class='level-2 type'>t</a>
+<a href="#value-return" class='level-2 value'>return</a>
+<a href="#value-flatMap" class='level-2 value'>flatMap</a>
+<a href="#value-flatMapUnhandled" class='level-2 value'>flatMapUnhandled</a>
+<a href="#value-map" class='level-2 value'>map</a>
+<a href="#value-mapUnhandled" class='level-2 value'>mapUnhandled</a>
+<a href="#value-sideEffect" class='level-2 value'>sideEffect</a>
+<a href="#value-onError" class='level-2 value'>onError</a>
+<a href="#value-wrap" class='level-2 value'>wrap</a>
+<a href="#value-unsafeWrap" class='level-2 value'>unsafeWrap</a>
+<a href="#type-container" class='level-2 type'>container</a>
+<a href="#value-unwrap" class='level-2 value'>unwrap</a>
+<a href="#value-all2" class='level-2 value'>all2</a>
+<a href="#value-all3" class='level-2 value'>all3</a>
+<a href="#value-all4" class='level-2 value'>all4</a>
+<a href="#value-all" class='level-2 value'>all</a>
+<a href="#module-Result" class='level-2 module'>Result</a>
+      </div>
+      <div class='project-listing'><div class='project-title'>Package modules</div><a href="soundness_tests.html">soundness_tests</a>
+<a href="vow.html">vow</a></div>
+    </div>
+    </div>
+  
+    <div class='main'>
+    
+    <a href="#vow" id="vow"><h1>vow</h1></a>
+
+<p><span class='missing'>This module does not have a toplevel documentation block.</span></p>
+<div class='doc-item'><h4 class='item'>type <a href="#type-handled" id="type-handled">handled</a></h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>type <a href="#type-unhandled" id="type-unhandled">unhandled</a></h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>type <a href="#type-t" id="type-t">t</a>('a, 'status)</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-return" id="value-return">return</a> = 'a => <a href="#type-t">t</a>('a, <a href="#type-handled">handled</a>)</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-flatMap" id="value-flatMap">flatMap</a> = ('a => <a href="#type-t">t</a>('b, 'status), <a href="#type-t">t</a>('a, <a href="#type-handled">handled</a>)) => <a href="#type-t">t</a>(
+    'b,
+    'status
+)</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-flatMapUnhandled" id="value-flatMapUnhandled">flatMapUnhandled</a> = (
+    'a => <a href="#type-t">t</a>('b, 'status),
+    <a href="#type-t">t</a>('a, <a href="#type-unhandled">unhandled</a>)
+) => <a href="#type-t">t</a>('b, <a href="#type-unhandled">unhandled</a>)</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-map" id="value-map">map</a> = ('a => 'b, <a href="#type-t">t</a>('a, <a href="#type-handled">handled</a>)) => <a href="#type-t">t</a>('b, 'status)</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-mapUnhandled" id="value-mapUnhandled">mapUnhandled</a> = ('a => 'b, <a href="#type-t">t</a>('a, <a href="#type-unhandled">unhandled</a>)) => <a href="#type-t">t</a>(
+    'b,
+    <a href="#type-unhandled">unhandled</a>
+)</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-sideEffect" id="value-sideEffect">sideEffect</a> = ('a => unit, <a href="#type-t">t</a>('a, <a href="#type-handled">handled</a>)) => unit</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-onError" id="value-onError">onError</a> = (
+    unit => <a href="#type-t">t</a>('a, 'status),
+    <a href="#type-t">t</a>('a, <a href="#type-unhandled">unhandled</a>)
+) => <a href="#type-t">t</a>('a, 'status)</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-wrap" id="value-wrap">wrap</a> = Js.Promise.t('a) => <a href="#type-t">t</a>('a, <a href="#type-unhandled">unhandled</a>)</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-unsafeWrap" id="value-unsafeWrap">unsafeWrap</a> = Js.Promise.t('a) => <a href="#type-t">t</a>('a, <a href="#type-handled">handled</a>)</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>type <a href="#type-container" id="type-container">container</a>('a) = {value: 'a}</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-unwrap" id="value-unwrap">unwrap</a> = <a href="#type-t">t</a>('a, <a href="#type-handled">handled</a>) => Js.Promise.t(<a href="#type-container">container</a>('a))</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-all2" id="value-all2">all2</a> = (<a href="#type-t">t</a>('v1, <a href="#type-handled">handled</a>), <a href="#type-t">t</a>('v2, <a href="#type-handled">handled</a>)) => <a href="#type-t">t</a>(
+    ('v1, 'v2),
+    <a href="#type-handled">handled</a>
+)</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-all3" id="value-all3">all3</a> = (
+    <a href="#type-t">t</a>('v1, <a href="#type-handled">handled</a>),
+    <a href="#type-t">t</a>('v2, <a href="#type-handled">handled</a>),
+    <a href="#type-t">t</a>('v3, <a href="#type-handled">handled</a>)
+) => <a href="#type-t">t</a>(('v1, 'v2, 'v3), <a href="#type-handled">handled</a>)</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-all4" id="value-all4">all4</a> = (
+    <a href="#type-t">t</a>('v1, <a href="#type-handled">handled</a>),
+    <a href="#type-t">t</a>('v2, <a href="#type-handled">handled</a>),
+    <a href="#type-t">t</a>('v3, <a href="#type-handled">handled</a>),
+    <a href="#type-t">t</a>('v4, <a href="#type-handled">handled</a>)
+) => <a href="#type-t">t</a>(('v1, 'v2, 'v3, 'v4), <a href="#type-handled">handled</a>)</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item'>let <a href="#value-all" id="value-all">all</a> = list(<a href="#type-t">t</a>('value, <a href="#type-handled">handled</a>)) => <a href="#type-t">t</a>(
+    list('value),
+    <a href="#type-handled">handled</a>
+)</h4>
+
+<div class='body body-empty'></div></div>
+
+<div class='doc-item'><h4 class='item module'>module <a href="#module-Result" id="module-Result">Result</a> : ResultType</h4></div>
+
+    </div>
+    <div class='right-blank'></div>
+    </div>
+  

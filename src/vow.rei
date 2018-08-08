@@ -105,7 +105,7 @@ let all: list(t('value, handled)) => t(list('value), handled);
 module type ResultType = {
   type vow('a, 'status) = t('a, 'status);
   type t('value, 'error, 'status) =
-    vow(Js.Result.t('value, 'error), 'status);
+    vow(Belt.Result.t('value, 'error), 'status);
   let return: 'value => t('value, 'error, handled);
   let fail: 'error => t('value, 'error, handled);
   let flatMap:
@@ -121,7 +121,7 @@ module type ResultType = {
     ('a => t('value, 'b, handled), t('value, 'a, 'status)) =>
     t('value, 'b, 'status);
   let sideEffect:
-    (Js.Result.t('value, 'error) => unit, t('value, 'error, handled)) => unit;
+    (Belt.Result.t('value, 'error) => unit, t('value, 'error, handled)) => unit;
   let onError:
     (unit => t('error, 'value, 'status), t('error, 'value, unhandled)) =>
     t('error, 'value, 'status);
@@ -129,7 +129,7 @@ module type ResultType = {
     (Js.Promise.t('value), unit => 'error) => t('value, 'error, handled);
   let unwrap:
     (
-      Js.Result.t('value, 'error) => vow('a, 'status),
+      Belt.Result.t('value, 'error) => vow('a, 'status),
       t('value, 'error, handled)
     ) =>
     vow('a, 'status);

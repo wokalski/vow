@@ -20,8 +20,8 @@
     "email": "me@wczekalski.com",
     "url": "http://twitter.com/wokalski"
   },
-  "version": "0.0.3",
+  "version": "0.1.0",
   "devDependencies": {
-    "bs-platform": "^2.2.3"
+    "bs-platform": "^4.0.3"
   }
 }

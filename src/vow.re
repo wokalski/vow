@@ -24,7 +24,7 @@ module Vow = {
     ();
   };
   let onError = (handler, vow) => {
-    promise: Js.Promise.catch((_) => handler().promise, vow.promise),
+    promise: Js.Promise.catch(_ => handler().promise, vow.promise),
   };
   let wrap = promise => {
     promise:
@@ -90,7 +90,8 @@ module type ResultType = {
     ('a => t('value, 'b, handled), t('value, 'a, 'status)) =>
     t('value, 'b, 'status);
   let sideEffect:
-    (Belt.Result.t('value, 'error) => unit, t('value, 'error, handled)) => unit;
+    (Belt.Result.t('value, 'error) => unit, t('value, 'error, handled)) =>
+    unit;
   let onError:
     (unit => t('error, 'value, 'status), t('error, 'value, unhandled)) =>
     t('error, 'value, 'status);

@@ -22,7 +22,5 @@ Js.Promise.resolve(Vow.return("hello"))
 
 Vow.return(Js.Promise.resolve("unwrapping"))
 |> Vow.unwrap
-|> Js.Promise.then_((promise: Vow.container(_)) =>
-     Js.Promise.then_(x => Js.log(x) |> Js.Promise.resolve, promise.value)
-   )
+|> Js.Promise.then_(x => Js.log(x) |> Js.Promise.resolve)
 |> ignore;

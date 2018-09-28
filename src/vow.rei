@@ -60,7 +60,7 @@ type container('a) = {value: 'a};
 /***
  * Returns the underlying JS Promise.
  */
-let unwrap: t('a, handled) => Js.Promise.t(container('a));
+let unwrap: t('a, handled) => Js.Promise.t('a);
 
 /***
  * Takes a tuple of 2 vows and returns a vow with a tuple of their results

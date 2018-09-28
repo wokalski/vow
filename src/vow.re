@@ -40,7 +40,9 @@ module Vow = {
         promise,
       ),
   };
-  let unwrap = ({promise}) => promise;
+  let unwrap = ({promise}) =>
+    promise
+    |> Js.Promise.(then_(({value}: container('a)) => value |> resolve));
   let all2 = ((v1, v2)) =>
     v1
     |> flatMap(v1Result =>

@@ -1,0 +1,197 @@
+
+    
+<!doctype html>
+<meta charset=utf8>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel=stylesheet href='./styles.css'>
+<script defer src='./script.js'></script>
+<title>Home</title>
+<body>
+<script>window.relativeToRoot="."</script>
+<script defer src="./block-script.js"></script>
+<div id='error-message'>
+  ⚠️ Oops! This page doesn't appear to define a <span>type</span> called <code>_</code>.
+</div>
+
+    
+    <div class='container'>
+    
+    <div class='sidebar-wrapper'>
+    <div class='sidebar-expander'>Show navigation</div>
+    <div class='sidebar'>
+      <a href="./search.html" style="display: block; padding: 0 8px;">Search</a>
+      <div class='docs-listing'><a href="./index.html">Home</a></div>
+      <div class='table-of-contents'>
+      <div class='toc-header'>Page Contents</div>
+      <a href="#vow" class='level-1 header'>Vow</a>
+<a href="#installation" class='level-2 header'>Installation</a>
+<a href="#side-effects" class='level-2 header'>Side effects</a>
+<a href="#unwrapping" class='level-2 header'>Unwrapping</a>
+<a href="#nesting-vows" class='level-2 header'>Nesting vows</a>
+<a href="#binding" class='level-2 header'>Binding</a>
+<a href="#example" class='level-2 header'>Example</a>
+<a href="#author" class='level-2 header'>Author</a>
+      </div>
+      <div class='project-listing'><div class='project-title'>Package modules</div><a href="./api/soundness_tests.html">soundness_tests</a>
+<a href="./api/vow.html">vow</a></div>
+    </div>
+    </div>
+  
+    <div class='main'>
+    
+    <a href="#vow" id="vow"><h1>Vow</h1></a>
+
+<p><code>Vow</code> is a tiny library which allows you to handle promises more safely in your Bucklescript application.</p>
+<p>A <code>Vow</code> can be either <code>handled</code> and <code>unhandled</code>. All promises of type <code>vow &#39;a handled</code> make sure that you handled Promise rejections. Thanks to that you will avoid the Uncaught promise error.</p>
+<a href="#installation" id="installation"><h2>Installation</h2></a>
+
+<pre class='sh'><code class='sh'>npm install --save @wokalski/vow</code></pre>
+
+<p>Then add <code>vow</code> to <code>bs-dependencies</code> in your <code>bsconfig.json</code>:</p>
+<pre class='js'><code class='js'>{
+  ...
+  &quot;bs-dependencies&quot;: [&quot;@wokalski/vow&quot;]
+}</code></pre>
+
+<a href="#side-effects" id="side-effects"><h2>Side effects</h2></a>
+
+<p>After series of operations you usually want to &quot;consume&quot; a promise. <code>Vow.sideEffect</code> should be used for that.</p>
+<p>It only accepts promises which are properly handled.</p>
+<a href="#unwrapping" id="unwrapping"><h2>Unwrapping</h2></a>
+
+<p>You can unwrap a handled promise using <code>Vow.unwrap</code>.</p>
+<a href="#nesting-vows" id="nesting-vows"><h2>Nesting vows</h2></a>
+
+<p><code>Js.Promise.t</code> is unsafe when you nest promises. i.e. <code>Js.Promise.t (Js.Promise.t &#39;a)</code> is unsound. In the runtime it&#39;s <code>Js.Promise.t</code>.</p>
+<p>This is resolved with <code>vow</code>s. If you nest <code>vow</code>s they behave as expected.</p>
+<p>However if you put a <code>Js.Promise.t</code> inside a <code>vow</code> (which are boxed <code>Js.Promise.t</code> under the scenes) you&#39;re gonna get a <code>vow</code> of the following type:</p>
+<div class='code-block'>
+  <pre class='code' data-block-id='0' id='block-0'><code>/* in Reason syntax */
+
+vow (Js.Promise.t &#39;a) &#39;status</code></pre>
+  <script type='docre-source' data-block-id="0">/* in Reason syntax */
+
+vow (Js.Promise.t 'a) 'status</script>
+  <div class='parse-error'>Parse Error:\nFile &quot;&quot;, line 3, characters 18-19:
+Error: 965: syntax error, consider adding a `;&#39; before</div>
+</div><p>However, under the scenes it&#39;ll really be</p>
+<div class='code-block'>
+  <pre class='code' data-block-id='1' id='block-1'><code>
+vow &#39;a &#39;status</code></pre>
+  <script type='docre-source' data-block-id="1">
+vow 'a 'status</script>
+  <div class='parse-error'>Parse Error:\nFile &quot;&quot;, line 1, characters 4-5:
+Error: 2311: syntax error, consider adding a `;&#39; before</div>
+</div>
+
+<p>Therefore <code>vow</code> is not sound.</p>
+<a href="#binding" id="binding"><h2>Binding</h2></a>
+
+<p>In order to use vows you have to bind to your existing APIs using <code>Vow.wrap</code>/<code>Vow.unsafeWrap</code>.</p>
+<p>If you <code>unsafeWrap</code> a promise which does throw your code will be unsound.</p>
+<a href="#example" id="example"><h2>Example</h2></a>
+
+<p>Let&#39;s see a real world example of vows with some comments:</p>
+<div class='code-block'>
+  <pre class='code' data-block-id='2' id='block-2'><code>let login _: Vow.Result.t authenticationState error Vow.handled =&gt;
+  /* Returns a handled Vow.Result.t */
+  Login.logIn () |&gt;
+  /* Validates the returned value. Since the vow is handled we don&#39;t need to catch*/
+  Vow.Result.flatMap (
+    fun x =&gt;
+      if x##isCancelled {
+        Vow.Result.fail LoginRequestCancelled
+      } else {
+        Vow.Result.return ()
+      }
+  ) |&gt;
+  /* Another handled Vow.Result.t */
+  Vow.Result.flatMap Login.getCurrentAccessToken () |&gt;
+  Vow.Result.map (
+    fun x =&gt; {
+      let token = x##accessToken;
+      /* This returns an unhandled Vow.Result.t.
+       * Note that the &#39;error types have to match
+       * Because after one error the subsequent operations
+       * Are not performed.
+       */
+      Queries.login ::token
+    }
+  ) |&gt;
+  /* Ooops, the `Queries.login` might reject.
+   * We are forced to handle it in the compile time.
+   */
+  Vow.Result.onError (fun _ =&gt; Vow.Result.fail GraphQlSignInError) |&gt;
+  Vow.Result.flatMap (
+    fun x =&gt;
+      switch x {
+      | Authenticated {token, userId} =&gt;
+        /* The promise we wrap is never rejected */
+        Vow.unsafeWrap
+          KeyChain.(
+            Js.Promise.all2 (
+              setGenericPassword username::&quot;userId&quot; password::userId service::&quot;userId&quot;,
+              setGenericPassword username::&quot;token&quot; password::token service::&quot;token&quot;
+            )
+          ) |&gt;
+        Vow.map (fun _ =&gt; Vow.Result.return x)
+      | _ =&gt; Vow.Result.return x
+      }
+  );</code></pre>
+  <script type='docre-source' data-block-id="2">let login _: Vow.Result.t authenticationState error Vow.handled =>
+  /* Returns a handled Vow.Result.t */
+  Login.logIn () |>
+  /* Validates the returned value. Since the vow is handled we don't need to catch*/
+  Vow.Result.flatMap (
+    fun x =>
+      if x##isCancelled {
+        Vow.Result.fail LoginRequestCancelled
+      } else {
+        Vow.Result.return ()
+      }
+  ) |>
+  /* Another handled Vow.Result.t */
+  Vow.Result.flatMap Login.getCurrentAccessToken () |>
+  Vow.Result.map (
+    fun x => {
+      let token = x##accessToken;
+      /* This returns an unhandled Vow.Result.t.
+       * Note that the 'error types have to match
+       * Because after one error the subsequent operations
+       * Are not performed.
+       */
+      Queries.login ::token
+    }
+  ) |>
+  /* Ooops, the `Queries.login` might reject.
+   * We are forced to handle it in the compile time.
+   */
+  Vow.Result.onError (fun _ => Vow.Result.fail GraphQlSignInError) |>
+  Vow.Result.flatMap (
+    fun x =>
+      switch x {
+      | Authenticated {token, userId} =>
+        /* The promise we wrap is never rejected */
+        Vow.unsafeWrap
+          KeyChain.(
+            Js.Promise.all2 (
+              setGenericPassword username::"userId" password::userId service::"userId",
+              setGenericPassword username::"token" password::token service::"token"
+            )
+          ) |>
+        Vow.map (fun _ => Vow.Result.return x)
+      | _ => Vow.Result.return x
+      }
+  );</script>
+  <div class='parse-error'>Parse Error:\nFile &quot;&quot;, line 1, characters 10-11:
+Error: 1526: underscore is not a valid identifier. Use _ only in pattern matching and partial function application</div>
+</div>
+
+<a href="#author" id="author"><h2>Author</h2></a>
+
+<p><a href="http://twitter.com/wokalski" target="_blank" rel="noopener nofollow" title="" class="external-link">@wokalski</a></p>
+
+    </div>
+    <div class='right-blank'></div>
+    </div>
+  

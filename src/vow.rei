@@ -41,7 +41,8 @@ let sideEffect: ('a => unit, t('a, handled)) => unit;
 /***
  * Catches and handles the rejection of a backing promise.
  */
-let onError: (unit => t('a, 'status), t('a, unhandled)) => t('a, 'status);
+let onError:
+  (Js.Promise.error => t('a, 'status), t('a, unhandled)) => t('a, 'status);
 
 /***
  * Wraps a promise into a vow. You should use this function for wrapping promises that
@@ -110,10 +111,14 @@ module type ResultType = {
     (Belt.Result.t('value, 'error) => unit, t('value, 'error, handled)) =>
     unit;
   let onError:
-    (unit => t('error, 'value, 'status), t('error, 'value, unhandled)) =>
+    (
+      Js.Promise.error => t('error, 'value, 'status),
+      t('error, 'value, unhandled)
+    ) =>
     t('error, 'value, 'status);
   let wrap:
-    (Js.Promise.t('value), unit => 'error) => t('value, 'error, handled);
+    (Js.Promise.t('value), Js.Promise.error => 'error) =>
+    t('value, 'error, handled);
   let unwrap:
     (
       Belt.Result.t('value, 'error) => vow('a, 'status),

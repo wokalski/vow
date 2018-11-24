@@ -24,7 +24,7 @@ module Vow = {
     ();
   };
   let onError = (handler, vow) => {
-    promise: Js.Promise.catch(_ => handler().promise, vow.promise),
+    promise: Js.Promise.catch(err => handler(err).promise, vow.promise),
   };
   let wrap = promise => {
     promise:
@@ -95,10 +95,14 @@ module type ResultType = {
     (Belt.Result.t('value, 'error) => unit, t('value, 'error, handled)) =>
     unit;
   let onError:
-    (unit => t('error, 'value, 'status), t('error, 'value, unhandled)) =>
+    (
+      Js.Promise.error => t('error, 'value, 'status),
+      t('error, 'value, unhandled)
+    ) =>
     t('error, 'value, 'status);
   let wrap:
-    (Js.Promise.t('value), unit => 'error) => t('value, 'error, handled);
+    (Js.Promise.t('value), Js.Promise.error => 'error) =>
+    t('value, 'error, handled);
   let unwrap:
     (
       Belt.Result.t('value, 'error) => vow('a, 'status),
@@ -178,7 +182,7 @@ module Result: ResultType = {
   let wrap = (promise, handler) =>
     Vow.wrap(promise)
     |> Vow.flatMapUnhandled(x => return(x))
-    |> onError(() => fail(handler()));
+    |> onError(err => fail(handler(err)));
   let unwrap = (transform, vow) => Vow.flatMap(transform, vow);
   let all2 = ((v1, v2)) =>
     v1

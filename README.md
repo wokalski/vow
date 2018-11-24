@@ -28,28 +28,6 @@ It only accepts promises which are properly handled.
 
 You can unwrap a handled promise using `Vow.unwrap`.
 
-## Nesting vows
-
-`Js.Promise.t` is unsafe when you nest promises. i.e. `Js.Promise.t (Js.Promise.t 'a)` is unsound. In the runtime it's `Js.Promise.t`.
-
-This is resolved with `vow`s. If you nest `vow`s they behave as expected.
-
-However if you put a `Js.Promise.t` inside a `vow` (which are boxed `Js.Promise.t` under the scenes) you're gonna get a `vow` of the following type:
-
-```reason
-/* in Reason syntax */
-
-vow (Js.Promise.t 'a) 'status
-```
-However, under the scenes it'll really be
-
-```reason
-
-vow 'a 'status
-```
-
-Therefore `vow` is not sound.
-
 ## Binding
 
 In order to use vows you have to bind to your existing APIs using `Vow.wrap`/`Vow.unsafeWrap`.
@@ -110,5 +88,4 @@ let login _: Vow.Result.t authenticationState error Vow.handled =>
 
 ## Author
 
-[@wokalski](http://twitter.com/wokalski) 
-
+[@wokalski](http://twitter.com/wokalski)

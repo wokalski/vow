@@ -144,6 +144,13 @@ module type ResultType = {
     t(('v1, 'v2, 'v3, 'v4), 'error, handled);
   let all:
     list(t('value, 'error, handled)) => t(list('value), 'error, handled);
+  let tap:
+    ('value => unit, t('value, 'error, handled)) =>
+    t('value, 'error, 'status);
+  let tapError:
+    ('error => unit, t('value, 'error, handled)) =>
+    t('value, 'error, 'status);
+
   module Infix: {
     let (>>=):
       (t('a, 'error, handled), 'a => t('b, 'error, 'status)) =>
